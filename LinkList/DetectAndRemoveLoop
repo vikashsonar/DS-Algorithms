@@ -1,0 +1,109 @@
+#include<stdio.h>
+#include<stdlib.h>
+
+/* Link list node */
+struct node
+{
+	int data;
+	struct node* next;
+};
+
+/* Function to remove loop. */
+void removeLoop(struct node *, struct node *);
+
+/* This function detects and removes loop in the list
+If loop was there in the list then it returns 1,
+otherwise returns 0 */
+int detectAndRemoveLoop(struct node *list)
+{
+	struct node* slow = list;
+	struct node* fast = list;
+	
+	while (slow && fast && fast->next)
+	{
+	    slow = slow->next;
+	    fast = fast->next->next;
+	    if (slow == fast)
+	    {
+	        removeLoop (slow, list);
+	        return 1;
+	    }
+	}
+	
+	/* Return 0 to indeciate that ther is no loop*/
+	return 0;
+}
+
+/* Function to remove loop.
+loop_node --> Pointer to one of the loop nodes
+head --> Pointer to the start node of the linked list */
+void removeLoop(struct node *loop_node, struct node *head)
+{
+    
+	struct node* ptr1 = loop_node;
+	struct node* ptr2 = loop_node;
+	
+	int k = 1;
+	while (ptr1->next != ptr2)
+	{
+	    ptr1 = ptr1->next;
+	    ++k;
+	}
+	
+	ptr1 = head;
+	ptr2 = head;
+	for (int cnt = 0; cnt < k; ++cnt)
+	{
+	    ptr2 = ptr2->next;
+	}
+	
+	//struct node* lastNode = NULL;
+	while (ptr1 != ptr2)
+	{
+	    ptr1 = ptr1->next;
+	    ptr2 = ptr2->next;
+	}
+	
+	ptr2 = ptr2->next;
+	while (ptr2->next != ptr1)
+       ptr2 = ptr2->next;
+	
+	ptr2->next = NULL;
+}
+
+/* Function to print linked list */
+void printList(struct node *node)
+{
+	while (node != NULL)
+	{
+		printf("%d ", node->data);
+		node = node->next;
+	}
+}
+
+struct node *newNode(int key)
+{
+	struct node *temp = new struct node;
+	temp->data = key;
+	temp->next = NULL;
+	return temp;
+}
+
+/* Driver program to test above function*/
+int main()
+{
+	struct node *head = newNode(50);
+	head->next = newNode(20);
+	head->next->next = newNode(15);
+	head->next->next->next = newNode(4);
+	head->next->next->next->next = newNode(10);
+
+	/* Create a loop for testing */
+	head->next->next->next->next->next = head->next->next;
+
+	detectAndRemoveLoop(head);
+
+	printf("Linked List after removing loop \n");
+	printList(head);
+	return 0;
+}
